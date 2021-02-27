@@ -9,6 +9,8 @@
 // to blink or not to blink...
 bool doBlinking = true;
 
+// MAC address 
+uint32_t chipId = 0;
 
 /////////////////////////////////////////////////////////////////////////////
 // utilities
@@ -82,12 +84,16 @@ void loop() {
   #ifdef ARDUINO_SERIAL_PORT
     printf("ARDUINO_SERIAL_PORT=%d\n", ARDUINO_SERIAL_PORT);
   #endif
-
   #ifdef ARDUINO_IDE_BUILD
     printf("ARDUINO_IDE_BUILD is defined\n");
   #else
     printf("no definition of ARDUINO_IDE_BUILD\n");
   #endif
+
+  for(int i=0; i<17; i=i+8) {
+    chipId |= ((ESP.getEfuseMac() >> (40 - i)) & 0xff) << i;
+  }
+  Serial.print("Chip ID: "); Serial.println(chipId);
 
   if(doBlinking) digitalWrite(BUILTIN_LED, HIGH);
   WAIT_SECS(2)
