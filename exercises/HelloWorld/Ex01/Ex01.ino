@@ -19,7 +19,7 @@ void setup() {
 void loop() {
   
   WiFi.mode(WIFI_MODE_STA);
-  Serial.println("ESP Board MAC Address: ");
+  Serial.println("\nESP Board MAC Address: ");
   Serial.print(WiFi.macAddress());
   
   digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
