@@ -4,18 +4,18 @@
 #include <esp_log.h>
 #include <WiFi.h>
 #include <WebServer.h>
+#include <HTTPClient.h>
 
 // Webserver
 WebServer webServer(80);
 
 // LEDs
-const int LED_R = 32;
+const int LED_R = 33;
 const int LED_Y = 15;
-const int LED_G = 33;
+const int LED_G = 32;
 bool go = true;
 
 // Touch Sensor
-
 const int WIRE_THRESHOLD = 20;
 const int CABLE_THRESHOLD = 73;
 int touchValue = 0;
@@ -26,6 +26,10 @@ int diff = 0;
 int nearbySSIDs = 0;
 bool wifi = true;
 
+// IFTTT
+const char* request = "https://maker.ifttt.com/trigger/play_some_tunez/with/key/uVFu5_EVZh-ldMw9irxrV";
+
+// CSS
 const char *styleArr[] = { // boilerplate: constants & pattern parts of template         // 8
   "html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}\n",
   "body{margin-top: 50px;} h1 {color: #444444;margin: 50px auto 30px;} h3 {color: #444444;margin-bottom: 30px;}\n",
@@ -39,6 +43,7 @@ const char *styleArr[] = { // boilerplate: constants & pattern parts of template
   
 };
 
+// Body HTML content
 const char *bodyArr[] = { 
   
   "<h1>ESP32 Web Server</h1>\n",
@@ -46,6 +51,7 @@ const char *bodyArr[] = {
 
 };
 
+// Body HTML content - LED Control page
 const char *bodyArr2[] = { 
   
   "<h1>ESP32 Web Server</h1>\n",
@@ -94,6 +100,8 @@ void startWebServer(){
 
 }
 
+// Building HTML for root page
+
 void handleRoot(){
   dp("getting root page")
   
@@ -105,6 +113,8 @@ void handleRoot(){
 
   webServer.send(200, "text/html", toSend);
 }
+
+// Building HTML for LED control page
 
 void handleChange(){
   dp("changing lights")
@@ -118,9 +128,11 @@ void handleChange(){
   webServer.send(200, "text/html", toSend);
 }
 
-void handleConnect() {
-  dp("attempting to connect to network")
+// Building HTML for Wifi Status page
 
+void handleConnect() {
+
+  // Strings to store agrs from provisioning form
   String ssid = "";
   String password = "";
   
@@ -131,29 +143,33 @@ void handleConnect() {
       password = webServer.arg(i);
   }
 
-  if(ssid == "") {
-    dp("WiFi sign in failed - invalid SSID");
-    wifi = false;
-  } else {
-    wifi = true;
-    char ssidchars[ssid.length()+1];
-    char passchars[password.length()+1];
-    ssid.toCharArray(ssidchars, ssid.length()+1);
-    password.toCharArray(passchars, password.length()+1);
-    WiFi.begin(ssidchars, passchars);
-    dp("Credentials entered");
-    dp(ssidchars)
-    dp(passchars)
-  }
+  // Getting credentials
+  char ssidchars[ssid.length()+1];
+  char passchars[password.length()+1];
+  ssid.toCharArray(ssidchars, ssid.length()+1);
+  password.toCharArray(passchars, password.length()+1);
 
+  // Entering credentials
+  WiFi.begin(ssidchars, passchars);    
+  dp("Connecting");
+      
+  while(WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    dp("Not connected - trying again");
+  }
+  
+  dps("Connected to WiFi network with IP Address: ", WiFi.localIP());
+
+  // Loading the status page
   String toSend = getPageTop("COM3505 - Connect");
   toSend += getPageStyle();
-  toSend += getConnectBody(wifi);
+  toSend += getConnectBody(true);
   toSend += getPageFooter();
 
   webServer.send(200, "text/html", toSend);
 }
 
+// Boilerplate template for all pages
 
 String getPageTop(String title) {
   return
@@ -163,6 +179,8 @@ String getPageTop(String title) {
     "<style>\n"
   ;
 };
+
+// Stylesheets for all pages
 
 String getPageStyle(){
   String style = "";
@@ -174,6 +192,8 @@ String getPageStyle(){
   return style;
 }
 
+// Body content for root page
+
 String getPageBody() {
 
   String body = "";
@@ -183,6 +203,8 @@ String getPageBody() {
   }
   return body;
 }
+
+// Body content for change page
 
 String getChangeBody() {
 
@@ -194,16 +216,19 @@ String getChangeBody() {
   return body;
 }
 
+// Body content for status page
+
 String getConnectBody(bool wifi) {
 
   String body = "";
-  int bodyArrSize = sizeof(bodyArr)/sizeof(bodyArr[0]); //4
+  int bodyArrSize = sizeof(bodyArr)/sizeof(bodyArr[0]);
   for(int i = 0; i < bodyArrSize; i++) {
       body.concat(bodyArr[i]);
   }
 
   body.concat("<h3>WiFi status: </h3>\n");
 
+  // Getting connection status  
   String state = "";
   switch(WiFi.status()) {
     case WL_IDLE_STATUS:
@@ -225,6 +250,8 @@ String getConnectBody(bool wifi) {
   
   return body;
 }
+
+// HTML for provisioning form
 
 String getPageForm(){
   String form = "";
@@ -261,36 +288,41 @@ String getPageForm(){
   return form;
 }
 
+// Boilerplate template footer for all pages
+
 String getPageFooter() {
   return "\n<p><a href='/'>Home</a>   <a href='/change'>LED</a></p></body></html>\n";
 }
 
+// Function to operate LED's like traffic lights
 
 void lightChange(){
 
-  Serial.println("\nLight change");
+  Serial.println("Light change");
   
   if (digitalRead(LED_G) == HIGH){ // if traffic light was green
-      delay(400);
-      digitalWrite(LED_G, LOW);
-      digitalWrite(LED_Y, HIGH);
-      delay(400);
-      digitalWrite(LED_Y, LOW);
-      digitalWrite(LED_R, HIGH);
-
-    } else {
-      delay(400);
-      digitalWrite(LED_R, LOW);
-      digitalWrite(LED_Y, HIGH);
-      delay(400);
-      digitalWrite(LED_Y, LOW);
-      digitalWrite(LED_G, HIGH);
-    }
+    delay(400);
+    digitalWrite(LED_G, LOW);
+    digitalWrite(LED_Y, HIGH);
+    delay(400);
+    digitalWrite(LED_Y, LOW);
+    digitalWrite(LED_R, HIGH);
+  
+  } else {
+    delay(400);
+    digitalWrite(LED_R, LOW);
+    digitalWrite(LED_Y, HIGH);
+    delay(400);
+    digitalWrite(LED_Y, LOW);
+    digitalWrite(LED_G, HIGH);
+  }
 }
+
+// Function to flash LED's
 
 void lightFlash(){
 
-  Serial.println("\nLight flash");
+  Serial.println("Light flash");
 
   digitalWrite(LED_R, HIGH);
   digitalWrite(LED_Y, HIGH);
@@ -311,8 +343,40 @@ void lightFlash(){
   
 }
 
+// GET request for IFTTT applet
+
+void doGET(){
+  //Check WiFi connection status
+  if(WiFi.status()== WL_CONNECTED){
+    
+    HTTPClient http;
+    dp("Sending request");
+    http.begin(request);
+    int httpCode = http.GET();
+    dps("HTTP Code: ", httpCode);
+    
+    if (httpCode > 0) { //Check for the returning code
+      
+      String payload = http.getString();
+      dps("Output: ", payload);
+      
+    } else {
+      dp("Error on HTTP request");
+    }
+      
+    // Free resources
+    http.end();
+    dp("HTTP client session closed");
+    
+  } else {
+    dp("WiFi Disconnected");
+  }
+  
+}
+
+// Input monitoring
+
 void loop() {
-  // put your main code here, to run repeatedly:
 
   // read value
   touchValue = touchRead(T6);
@@ -332,6 +396,8 @@ void loop() {
       lightChange();
     } else if (touchValue < CABLE_THRESHOLD){
       lightFlash();
+      doGET();
+      delay(1000);
     }
     
   }

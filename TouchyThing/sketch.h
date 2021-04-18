@@ -9,7 +9,7 @@
 
 #if DEBUG
 #define dp(s)   { Serial.println(F(s)); }
-#define dps(s,v)   { Serial.println(F(s)); Serial.println(v);}
+#define dps(s,v)   { Serial.print(F(s)); Serial.println(v);}
 #else
 #define dp(s)
 #define dps(s,v)
