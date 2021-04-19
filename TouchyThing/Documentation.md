@@ -125,7 +125,8 @@ The IFTTT event I set up uses the 'Webhooks' service which receives a web reques
 
 There is a limitation to this - If the spotify app on my device (phone or laptop) is not running/idle, the triggered action will fail due to a 400 error as show below
 
-![Spotify 400 error](https://i.imgur.com/sdFJrXb.png)*Spotify 400 error*
+![](https://i.imgur.com/sdFJrXb.png)
+*Spotify 400 error*
 
 ### References
 
