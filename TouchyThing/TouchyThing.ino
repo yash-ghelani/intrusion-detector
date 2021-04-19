@@ -74,12 +74,10 @@ void setup() {
 
   //Traffic light starts off green
   digitalWrite(LED_G, HIGH);
-
-  dp("Getting SSID's")
   
   nearbySSIDs = WiFi.scanNetworks(); //get number of nearby ssids
   
-  dp("Starting webserver")
+  dp("Starting webserver");
   
   if(! WiFi.mode(WIFI_AP_STA)){
     dp("failed to set Wifi mode");
