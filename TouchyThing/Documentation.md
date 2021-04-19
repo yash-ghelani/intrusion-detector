@@ -1,5 +1,4 @@
 # COM3505 - Assignment 1
-========================
 
 ### The IoT device I have created implements:
 
@@ -24,7 +23,17 @@ After connecting to the ESP32's access point, the user can:
 
 ### Demo
 
-#########################################################################################videos
+<figure class="video_container">
+  <iframe src="https://drive.google.com/file/d/1oypjRXK1XpKEpK6XduvklJfTvHOe3iBW/preview" frameborder="0" allowfullscreen="true"> </iframe>
+</figure>
+
+https://drive.google.com/file/d/1ozbMkNnQQQ6YjLn9UOkw2xQf9SBb08y-/view?usp=sharing
+
+<figure class="video_container">
+  <iframe src="https://drive.google.com/file/d/1ozbMkNnQQQ6YjLn9UOkw2xQf9SBb08y-/preview" frameborder="0" allowfullscreen="true"> </iframe>
+</figure>
+
+https://drive.google.com/file/d/1oypjRXK1XpKEpK6XduvklJfTvHOe3iBW/view?usp=sharing
 
 ### Device & Site breakdown
 
@@ -35,7 +44,7 @@ The circuit design of the device is simple; it consists of:
 - 3 LED's with resistors
 - A touch control wire
 
-![](https://pandao.github.io/editor.md/examples/images/4.jpg)
+![](https://i.imgur.com/9zX1iqD.jpg)
 
 > My IoT Device.
 
@@ -91,7 +100,7 @@ A user is able to provide internet access to a device by displaying a form for t
 
 - Scanning nearby networks
 
-![](https://pandao.github.io/editor.md/examples/images/4.jpg)
+![](https://i.imgur.com/HJM1TZa.jpg)
 
 The device is clearly able to detect and display the SSID's and connection strengths of the nearby networks
 
@@ -102,6 +111,7 @@ The status of the connection is checked 5 times before requesting that the user 
 Correct password  | Incorrect password
 ------------- | -------------
 ![](https://i.imgur.com/jGh6yPW.png) | ![](https://i.imgur.com/lX4a29X.png)
+![](https://i.imgur.com/hZ59kk7.jpg) | ![](https://i.imgur.com/qWMoZEl.jpg)
 
 
 ###### Testing IFTTT event
