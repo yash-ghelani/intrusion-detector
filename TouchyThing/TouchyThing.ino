@@ -150,18 +150,27 @@ void handleConnect() {
   // Entering credentials
   WiFi.begin(ssidchars, passchars);    
   dp("Connecting");
-      
-  while(WiFi.status() != WL_CONNECTED) {
+
+  // Test status 5 times
+  int tryCount = 0;  
+  while(WiFi.status() != WL_CONNECTED && tryCount < 5) {
     delay(500);
     dp("Not connected - trying again");
+    tryCount++;
+  }
+
+  if (WiFi.status() != WL_CONNECTED){
+    wifi = false;
+    dp("Connection failed - re-enter password");
+  } else {
+    wifi = true;
+    dps("Connected to WiFi network with IP Address: ", WiFi.localIP());
   }
   
-  dps("Connected to WiFi network with IP Address: ", WiFi.localIP());
-
   // Loading the status page
   String toSend = getPageTop("COM3505 - Connect");
   toSend += getPageStyle();
-  toSend += getConnectBody(true);
+  toSend += getConnectBody(wifi);
   toSend += getPageFooter();
 
   webServer.send(200, "text/html", toSend);
@@ -397,9 +406,7 @@ void loop() {
       doGET();
       delay(1000);
     }
-    
   }
-  
   
   // deal with any pending web requests
   webServer.handleClient(); 
