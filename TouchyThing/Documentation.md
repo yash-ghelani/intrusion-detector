@@ -119,7 +119,7 @@ Correct password  | Incorrect password
 The IFTTT event I set up uses the 'Webhooks' service which receives a web request, then triggers a Spotify playback event. I first ensure that the ESP32 is connected to the internet by checking the status of the WiFi, then send a GET request with the custom URL. I then verify the success of the request by printing the HTTP code - a returned value of 200 demonstrates that the IFTTT server received the request and triggered the action. I also print out the payload which is a stock message sent by the IFTTT server, confirming the action.
 
 *Serial output for IFTTT event triggering*  | IFTTT confirmation
----------------------------------------------------------------------
+----------------------------------- | ----------------------------------
 ![](https://i.imgur.com/uvJjbIl.png) | ![](https://i.imgur.com/Bk7UDib.png)
 
 
