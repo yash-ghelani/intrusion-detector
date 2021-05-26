@@ -14,6 +14,9 @@
 // Webserver
 WebServer webServer(80);
 
+// Iterations counter
+int iterations = 0;
+
 // LEDs
 const int LED_R = 15;
 const int LED_Y = 14;
@@ -63,9 +66,9 @@ const char *bodyArr2[] = {
   "<h1>ESP32 Web Server</h1>\n",
   "<h3>Using Access Point(AP) Mode</h3>\n",
   "<p>System Control: </p>\n",
-  "<a class=\"button button-off\" href=\"/change\">Activate System</a>\n",
-  "<a class=\"button button-off\" href=\"/change\">View Room</a>\n",
-  "<a class=\"button button-on\" href=\"/change\">HOME ALONE</a>\n",
+  "<a class=\"button button-off\" href=\"/activate\">Activate System</a>\n",
+  "<a class=\"button button-off\" href=\"/photo\">View Room</a>\n",
+  "<a class=\"button button-on\" href=\"/homealone\">HOME ALONE</a>\n",
 
 };
 
@@ -170,7 +173,10 @@ void setup() {
 
 void startWebServer(){
   webServer.on("/", handleRoot);
-  webServer.on("/change", handleChange);
+  webServer.on("/control", handleControl);
+  webServer.on("/activate", handleActivate);
+  webServer.on("/photo", handlePhoto);
+  webServer.on("/homealone", handleAlone);
   webServer.on("/connect", handleConnect);
   webServer.begin();
   dp("Web server started");
@@ -193,13 +199,52 @@ void handleRoot(){
 
 // Building HTML for LED control page
 
-void handleChange(){
+void handleControl(){
   dp("changing lights")
   lightChange();
   
-  String toSend = getPageTop("COM3505 - LED Control");
+  String toSend = getPageTop("COM3505 - System Control");
   toSend += getPageStyle();
-  toSend += getChangeBody();
+  toSend += getControlBody();
+  toSend += getPageFooter();
+
+  webServer.send(200, "text/html", toSend);
+}
+
+void handleActivate(){
+  
+  dp("Activating System")
+  lightChange();
+  
+  String toSend = getPageTop("COM3505 - System Control");
+  toSend += getPageStyle();
+  toSend += getControlBody();
+  toSend += getPageFooter();
+
+  webServer.send(200, "text/html", toSend);
+}
+
+void handlePhoto(){
+  dp("Taking photo...")
+  // takePhoto();
+  
+  String toSend = getPageTop("COM3505 - System Control");
+  toSend += getPageStyle();
+  toSend += getControlBody();
+  toSend += getPageFooter();
+
+  webServer.send(200, "text/html", toSend);
+}
+
+void handleAlone(){
+  dp("##############################################")
+  dp("############### HOME ALONE ###################")
+  dp("##############################################")
+  lightChange();
+  
+  String toSend = getPageTop("COM3505 - System Control");
+  toSend += getPageStyle();
+  toSend += getControlBody();
   toSend += getPageFooter();
 
   webServer.send(200, "text/html", toSend);
@@ -292,7 +337,7 @@ String getPageBody() {
 
 // Body content for change page
 
-String getChangeBody() {
+String getControlBody() {
 
   String body = "";
   int bodyArrSize = sizeof(bodyArr2)/sizeof(bodyArr2[0]); //4
@@ -377,7 +422,7 @@ String getPageForm(){
 // Boilerplate template footer for all pages
 
 String getPageFooter() {
-  return "\n<p><a href='/'>Home</a>   <a href='/change'>LED</a></p></body></html>\n";
+  return "\n<p><a href='/'>Home</a>   <a href='/control'>Control</a></p></body></html>\n";
 }
 
 // Function to operate LED's like traffic lights
@@ -463,14 +508,16 @@ void doGET(){
 void loop() {
   // put your main code here, to run repeatedly:
   
-  Serial.println(digitalRead(PIR));
-  delay(4000);
-  
-  if (digitalRead(PIR) == 123){
+  if (iterations == 10000 && digitalRead(PIR) == 1){
+    iterations = 0;
     dp("INTRUDER DETECTED");
     doGET();
-    delay(100000);
+    // takePhoto();
   }
+  
+  // iterations counter - regulated by 1 ms delay
+  iterations ++;
+  delay(1);
   
   // deal with any pending web requests
   webServer.handleClient();
