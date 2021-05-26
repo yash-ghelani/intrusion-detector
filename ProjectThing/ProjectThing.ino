@@ -32,6 +32,8 @@ bool wifi = true;
 
 // IFTTT
 const char* request = "https://maker.ifttt.com/trigger/play_some_tunez/with/key/uVFu5_EVZh-ldMw9irxrV";
+const char* request2 = "https://maker.ifttt.com/trigger/HOMEALONE/with/key/uVFu5_EVZh-ldMw9irxrV";
+const char* request3 = "https://maker.ifttt.com/trigger/reset/with/key/uVFu5_EVZh-ldMw9irxrV";
 
 // CSS
 const char *styleArr[] = { // boilerplate: constants & pattern parts of template         // 8
@@ -461,6 +463,14 @@ void doGET(){
 void loop() {
   // put your main code here, to run repeatedly:
   
+  Serial.println(digitalRead(PIR));
+  delay(4000);
+  
+  if (digitalRead(PIR) == 123){
+    dp("INTRUDER DETECTED");
+    doGET();
+    delay(100000);
+  }
   
   // deal with any pending web requests
   webServer.handleClient();
