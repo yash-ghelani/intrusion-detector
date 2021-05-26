@@ -11,17 +11,20 @@
 
 #include "camera_pins.h"
 
-const char* ssid = "virginmedia8224895";
-const char* password = "qqaahuzg";
-
 // Webserver
 WebServer webServer(80);
 
 // LEDs
-const int LED_R = 33;
-const int LED_Y = 15;
-const int LED_G = 32;
+const int LED_R = 15;
+const int LED_Y = 14;
+const int LED_G = 2;
 bool go = true;
+
+// PIR sensor
+const int PIR = 13;
+
+// Flash
+const int FLASH = 4;
 
 // Provisioning
 int nearbySSIDs = 0;
@@ -36,7 +39,7 @@ const char *styleArr[] = { // boilerplate: constants & pattern parts of template
   "body{margin-top: 50px;} h1 {color: #444444;margin: 50px auto 30px;} h3 {color: #444444;margin-bottom: 30px;}\n",
   ".button {display: block;width: 80px;background-color: #3498db;border: none;color: white;padding: 13px 30px;text-decoration: none;font-size: 25px;margin: 0px auto 35px;cursor: pointer;border-radius: 4px;}\n",
   ".button-submit {display: block;background-color: #34495e;border: none;color: white;padding: 13px 30px;text-decoration: none;font-size: 25px;margin: 0px auto 35px;cursor: pointer;border-radius: 4px;}\n",
-  ".button-on {background-color: #3498db;}\n",
+  ".button-on {background-color: #f44336;}\n",
   ".button-on:active {background-color: #2980b9;}\n",
   ".button-off {background-color: #34495e;}\n",
   ".button-off:active {background-color: #2c3e50;}\n",
@@ -52,13 +55,15 @@ const char *bodyArr[] = {
 
 };
 
-// Body HTML content - LED Control page
+// Body HTML content - System Control
 const char *bodyArr2[] = { 
   
   "<h1>ESP32 Web Server</h1>\n",
   "<h3>Using Access Point(AP) Mode</h3>\n",
-  "<p>LED Control: </p>\n",
-  "<a class=\"button button-off\" href=\"/change\">Change</a>\n",
+  "<p>System Control: </p>\n",
+  "<a class=\"button button-off\" href=\"/change\">Activate System</a>\n",
+  "<a class=\"button button-off\" href=\"/change\">View Room</a>\n",
+  "<a class=\"button button-on\" href=\"/change\">HOME ALONE</a>\n",
 
 };
 
