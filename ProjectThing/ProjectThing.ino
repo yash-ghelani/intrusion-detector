@@ -163,9 +163,9 @@ void setup() {
   if(! WiFi.softAP("ssid", "password")){
     dp("failed to start soft AP");
   }
-
+  
   startWebServer();
-  dp("System ready - connect to access point 'ssid'");
+  dp("System ready - connect to access point 'ssid'\n");
 
   // Initialize SPIFFS (SPI Flash File System) to save the last photo taken with the ESP32-CAM
   dp("Mounting SPIFFS");
@@ -176,7 +176,7 @@ void setup() {
   }
   else {
     delay(500);
-    dp("SPIFFS mounted successfully");
+    dp("SPIFFS mounted successfully\n");
   }
  
 }
@@ -189,7 +189,7 @@ void startWebServer(){
   webServer.on("/homealone", handleAlone);
   webServer.on("/connect", handleConnect);
   webServer.begin();
-  dp("Web server started");
+  dp("Web server started\n");
 
 }
 
@@ -222,12 +222,12 @@ void handleControl(){
 }
 
 void handleActivate(){
-
+  iterations = 0;
   if (digitalRead(LED_G) == HIGH){
-    dp("Activating System");
+    dp("\nActivating System\n");
     lightChange();
   } else {
-    dp("De-activating System");
+    dp("\nDe-activating System\n");
     lightChange();
     doGET(request3);
   }
@@ -253,10 +253,8 @@ void handlePhoto(){
 }
 
 void handleAlone(){
-  dp("##############################################")
-  dp("############### HOME ALONE ###################")
-  dp("##############################################")
-  
+  dp("\nInitiating HOME ALONE PROTOCOL\n")
+  iterations = 0;
   lightChange();
   doGET(request2);
   
@@ -306,7 +304,7 @@ void handleConnect() {
     dp("Connection failed - re-enter password");
   } else {
     wifi = true;
-    dps("Connected to WiFi network with IP Address: ", WiFi.localIP());
+    dps("\nConnected to WiFi network with IP Address: ", WiFi.localIP());
   }
   
   // Loading the status page
@@ -446,10 +444,8 @@ String getPageFooter() {
 // Function to operate LED's like traffic lights
 
 void lightChange(){
-
-  Serial.println("Light change");
   
-  if (digitalRead(LED_G) == HIGH){ // if traffic light was green
+  if (digitalRead(LED_G) == HIGH){ // if system is inactive
     delay(400);
     digitalWrite(LED_G, LOW);
     digitalWrite(LED_Y, HIGH);
@@ -457,7 +453,7 @@ void lightChange(){
     digitalWrite(LED_Y, LOW);
     digitalWrite(LED_R, HIGH);
   
-  } else {
+  } else { // if system is active
     delay(400);
     digitalWrite(LED_R, LOW);
     digitalWrite(LED_Y, HIGH);
@@ -490,7 +486,7 @@ void doGET(const char* request){
       
     // Free resources
     http.end();
-    dp("HTTP client session closed");
+    dp("HTTP client session closed\n");
     
   } else {
     dp("WiFi Disconnected");
@@ -502,7 +498,6 @@ void doGET(const char* request){
 bool checkPhoto( fs::FS &fs ) {
   File f_pic = fs.open( FILE_PHOTO );
   unsigned int pic_sz = f_pic.size();
-  Serial.println(pic_sz);
   return ( pic_sz > 100 );
 }
 
