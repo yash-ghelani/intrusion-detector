@@ -152,5 +152,5 @@
 #define PCLK_GPIO_NUM     21
 
 #else
-#error "Camera model not selected"
+  #error "Camera model not selected"
 #endif

@@ -5,27 +5,26 @@
 
 The idea for this project was based around this scene from one of my favourite movies - Home Alone. 
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/_NrfND5KGtk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+[![Home Alone House Party](https://img.youtube.com/vi/_NrfND5KGtk/0.jpg)](https://www.youtube.com/watch?v=_NrfND5KGtk "Home Alone House Party")
 
+There are three main features:
+- A standard intrusion detection mode: when activated, the alarm is sounded
+- Live photo capture and storage: the chip camera takes a photo of the room and stores to an SD card
+- House Party mode: Lights are turned on, music is playing, the party is started! (with the intrusion detection running in the background)
 
-- Touch-based LED control
-- Web-based LED control
-- ESP32 provisioning
-- Touch-based IFTTT Spotify control
+All of which can be controlled from a webserver!
 
 ### Using the Device:
 
-###### Offline control
-Before providing your network details to the ESP32 there are 2 ways to control the LED's on the board.
+1. Connect to the ESP32's access point
+2. Provide network details to connect the device to the internet
+3. Access the control page to:
+    - Activate/Deactivate the intrusion system
+    - Take and save a photo with the chip camera
+    - Activate the 'Home Alone Protocol'
 
-- Touching the wire will light up the LED's in a traffic light fashion (R -> Y -> G-> Y -> R...)
-- Touching the plastic will flash the LED's simultaneously in a heartbeat fashion
+A green LED indicates the system is not active - being in the room will not trigger the alarm. A red LED indiates the system is active - there is a 10 second window from when the system is activated to give the user time to leave the room before the alarm goes off. 
 
-###### Online control
-After connecting to the ESP32's access point, the user can:
-- Provide network details to connect the device to the internet
-    - Touch the plastic part of the wire to trigger the IFTTT Spotify event
-- Control the traffic light LED's via the 'Change' page buttons (If the lights are green, you can change it to red and vice versa)
 
 ### Demo
 
@@ -45,10 +44,10 @@ https://drive.google.com/file/d/1oypjRXK1XpKEpK6XduvklJfTvHOe3iBW/view?usp=shari
 
 ###### Design
 
-The circuit design of the device is simple; it consists of:
-- The ESP32
+The circuit design of the device:
+- ESP32-CAM board and FTDI adapter
+- PIR sensor
 - 3 LED's with resistors
-- A touch control wire
 
 ![](https://i.imgur.com/9zX1iqD.jpg)
 
@@ -73,7 +72,7 @@ The array  | The function | The page
 
 ### Testing
 
-###### Testing Touch Control
+###### Testing PIR sensor readings
 For the touch control I utilised the T6 pin on the ESP32 
 - touching the bare wire gave me readings within the range 10-15
 - touching the plastic gave me readings within the range 67-69
@@ -120,7 +119,7 @@ Correct password  | Incorrect password
 ![](https://i.imgur.com/hZ59kk7.jpg) | ![](https://i.imgur.com/qWMoZEl.jpg)
 
 
-###### Testing IFTTT event
+###### Testing IFTTT events
 
 The IFTTT event I set up uses the 'Webhooks' service which receives a web request, then triggers a Spotify playback event. I first ensure that the ESP32 is connected to the internet by checking the status of the WiFi, then send a GET request with the custom URL. I then verify the success of the request by printing the HTTP code - a returned value of 200 demonstrates that the IFTTT server received the request and triggered the action. I also print out the payload which is a stock message sent by the IFTTT server, confirming the action.
 
@@ -133,6 +132,12 @@ There is a limitation to this - If the spotify app on my device (phone or laptop
 
 ![](https://i.imgur.com/sdFJrXb.png)
 *Spotify 400 error*
+
+
+###### Testing photo capture and saving
+
+
+
 
 ### References
 
