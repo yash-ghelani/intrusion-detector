@@ -6,8 +6,13 @@
 #include <WiFi.h>
 #include <WebServer.h>
 #include <HTTPClient.h>
+#include <FS.h>
+#include <SPIFFS.h>
 
 #define CAMERA_MODEL_AI_THINKER // Has PSRAM
+
+// Photo File Name to save in SPIFFS
+#define FILE_PHOTO "/photo.jpg"
 
 #include "camera_pins.h"
 
@@ -34,9 +39,9 @@ int nearbySSIDs = 0;
 bool wifi = true;
 
 // IFTTT
-const char* request = "https://maker.ifttt.com/trigger/play_some_tunez/with/key/uVFu5_EVZh-ldMw9irxrV";
+const char* request = "https://maker.ifttt.com/trigger/INTRUDER/with/key/uVFu5_EVZh-ldMw9irxrV";
 const char* request2 = "https://maker.ifttt.com/trigger/HOMEALONE/with/key/uVFu5_EVZh-ldMw9irxrV";
-const char* request3 = "https://maker.ifttt.com/trigger/reset/with/key/uVFu5_EVZh-ldMw9irxrV";
+const char* request3 = "https://maker.ifttt.com/trigger/RESET/with/key/uVFu5_EVZh-ldMw9irxrV";
 
 // CSS
 const char *styleArr[] = { // boilerplate: constants & pattern parts of template         // 8
@@ -71,11 +76,6 @@ const char *bodyArr2[] = {
   "<a class=\"button button-on\" href=\"/homealone\">HOME ALONE</a>\n",
 
 };
-
-
-
-
-void startCameraServer();
 
 void setup() {
   Serial.begin(115200);
@@ -165,10 +165,20 @@ void setup() {
   }
 
   startWebServer();
-  Serial.print("Camera Ready! Use 'http://");
-  Serial.print(WiFi.localIP());
-  Serial.println("' to connect");
-  
+  dp("System ready - connect to access point 'ssid'");
+
+  // Initialize SPIFFS (SPI Flash File System) to save the last photo taken with the ESP32-CAM
+  dp("Mounting SPIFFS");
+
+  if (!SPIFFS.begin(true)) {
+    dp("An Error has occurred while mounting SPIFFS");
+    ESP.restart();
+  }
+  else {
+    delay(500);
+    dp("SPIFFS mounted successfully");
+  }
+ 
 }
 
 void startWebServer(){
@@ -200,8 +210,8 @@ void handleRoot(){
 // Building HTML for LED control page
 
 void handleControl(){
-  dp("changing lights")
-  lightChange();
+
+  dp("Accessing control page");
   
   String toSend = getPageTop("COM3505 - System Control");
   toSend += getPageStyle();
@@ -212,9 +222,16 @@ void handleControl(){
 }
 
 void handleActivate(){
+
+  if (digitalRead(LED_G) == HIGH){
+    dp("Activating System");
+    lightChange();
+  } else {
+    dp("De-activating System");
+    lightChange();
+    doGET(request3);
+  }
   
-  dp("Activating System")
-  lightChange();
   
   String toSend = getPageTop("COM3505 - System Control");
   toSend += getPageStyle();
@@ -225,8 +242,7 @@ void handleActivate(){
 }
 
 void handlePhoto(){
-  dp("Taking photo...")
-  // takePhoto();
+  takePhoto();
   
   String toSend = getPageTop("COM3505 - System Control");
   toSend += getPageStyle();
@@ -240,7 +256,9 @@ void handleAlone(){
   dp("##############################################")
   dp("############### HOME ALONE ###################")
   dp("##############################################")
+  
   lightChange();
+  doGET(request2);
   
   String toSend = getPageTop("COM3505 - System Control");
   toSend += getPageStyle();
@@ -449,34 +467,9 @@ void lightChange(){
   }
 }
 
-// Function to flash LED's
-
-void lightFlash(){
-
-  Serial.println("Light flash");
-
-  digitalWrite(LED_R, HIGH);
-  digitalWrite(LED_Y, HIGH);
-  digitalWrite(LED_G, HIGH);
-  delay(100);
-  digitalWrite(LED_R, LOW);
-  digitalWrite(LED_Y, LOW);
-  digitalWrite(LED_G, LOW);
-  delay(100);
-  digitalWrite(LED_R, HIGH);
-  digitalWrite(LED_Y, HIGH);
-  digitalWrite(LED_G, HIGH);
-  delay(100);
-  digitalWrite(LED_R, LOW);
-  digitalWrite(LED_Y, LOW);
-  digitalWrite(LED_G, LOW);
-  delay(100);
-  
-}
-
 // GET request for IFTTT applet
 
-void doGET(){
+void doGET(const char* request){
   //Check WiFi connection status
   if(WiFi.status()== WL_CONNECTED){
     
@@ -505,16 +498,68 @@ void doGET(){
   
 }
 
+// Check if photo capture was successful
+bool checkPhoto( fs::FS &fs ) {
+  File f_pic = fs.open( FILE_PHOTO );
+  unsigned int pic_sz = f_pic.size();
+  Serial.println(pic_sz);
+  return ( pic_sz > 100 );
+}
+
+// Capture Photo and Save it to SPIFFS
+void takePhoto() {
+
+  digitalWrite(FLASH, HIGH);
+  
+  camera_fb_t * fb = NULL; // pointer
+  bool ok = 0; // Boolean indicating if the picture has been taken correctly
+
+  do {
+    // Take a photo with the camera
+    dp("Taking a photo...");
+
+    fb = esp_camera_fb_get();
+    if (!fb) {
+      dp("Camera capture failed");
+      return;
+    }
+
+    // Photo file name
+    dps("Picture file name: ", FILE_PHOTO);
+    File file = SPIFFS.open(FILE_PHOTO, FILE_WRITE);
+
+    // Insert the data in the photo file
+    if (!file) {
+      dp("Failed to open file in writing mode");
+    }
+    else {
+      file.write(fb->buf, fb->len); // payload (image), payload length
+      dp("The picture has been saved in ");
+      dp(FILE_PHOTO);
+    }
+    // Close the file
+    file.close();
+    esp_camera_fb_return(fb);
+
+    // check if file has been correctly saved in SPIFFS
+    ok = checkPhoto(SPIFFS);
+  } while ( !ok );
+
+  digitalWrite(FLASH, LOW);
+}
+
 void loop() {
   // put your main code here, to run repeatedly:
-  
-  if (iterations == 10000 && digitalRead(PIR) == 1){
-    iterations = 0;
-    dp("INTRUDER DETECTED");
-    doGET();
-    // takePhoto();
+ 
+  if(digitalRead(LED_R) == HIGH){ // if system is active
+    if (iterations > 10000 && digitalRead(PIR) == 1){
+      iterations = 0;
+      dp("INTRUDER DETECTED");
+      doGET(request);
+      takePhoto();
+    }
   }
-  
+    
   // iterations counter - regulated by 1 ms delay
   iterations ++;
   delay(1);
