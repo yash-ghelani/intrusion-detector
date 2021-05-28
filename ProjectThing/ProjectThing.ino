@@ -51,7 +51,7 @@ const int FLASH = 4;
 int nearbySSIDs = 0;
 bool wifi = true;
 
-// IFTTT
+// IFTTT events
 const char* request = "https://maker.ifttt.com/trigger/INTRUDER/with/key/uVFu5_EVZh-ldMw9irxrV";
 const char* request2 = "https://maker.ifttt.com/trigger/HOMEALONE/with/key/uVFu5_EVZh-ldMw9irxrV";
 const char* request3 = "https://maker.ifttt.com/trigger/RESET/with/key/uVFu5_EVZh-ldMw9irxrV";
@@ -91,6 +91,9 @@ const char *bodyArr2[] = {
 };
 
 void setup() {
+
+  // Camera configuration code taken from the CameraWebServer example code
+  
   Serial.begin(115200);
   Serial.setDebugOutput(true);
   Serial.println();
@@ -156,7 +159,7 @@ void setup() {
   s->set_hmirror(s, 1);
 #endif
 
-  // ******************* new code ********************************]
+  // ******************* Example code end ********************************
 
   //set the LED as the output 
   pinMode(LED_R, OUTPUT);
@@ -526,20 +529,18 @@ void takePhoto() {
   bool ok = 0; // Boolean indicating if the picture has been taken correctly
 
   do {
-    // Take a photo with the camera
     dp("\nTaking a photo...");
-
+    
     fb = esp_camera_fb_get();
     if (!fb) {
       dp("Camera capture failed");
       return;
     }
-
-    // Photo file name
+    
     dps("Picture file name: ", FILE_PHOTO);
     File file = SPIFFS.open(FILE_PHOTO, FILE_WRITE);
 
-    // Insert the data in the photo file
+    // Copy frambuffer data into image file
     if (!file) {
       dp("Failed to open file in writing mode");
     } else {
@@ -566,7 +567,7 @@ void sendPhoto( void ) {
   smtpData.setSender("Intrusion Detection System", emailSenderAccount); // Set the sender name and Email
   smtpData.setPriority("High"); // email priority
   smtpData.setSubject(emailSubject); // Set the subject
-  smtpData.setMessage("<h2>Photo captured with ESP32-CAM and attached in this email.</h2>", true);
+  smtpData.setMessage("<h2>Movement Detected - Photo taken with ESP32-CAM</h2>", true);
   smtpData.addRecipient(emailRecipient); 
   smtpData.addAttachFile(FILE_PHOTO, "image/jpg"); // Add attach files from SPIFFS
   smtpData.setFileStorageType(MailClientStorageType::SPIFFS); // Set the storage type to attach files in your email (SPIFFS)
@@ -595,7 +596,7 @@ void loop() {
     if (iterations > 10000 && digitalRead(PIR) == 1){ // time between trigger ~10 seconds
       iterations = 0;
       dp("INTRUDER DETECTED");
-      doGET(request);
+      doGET(request); // Intruder IFTTT event
       takePhoto();
       sendPhoto();
     }
