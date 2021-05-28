@@ -125,7 +125,7 @@ For this project, I have set up 3 IFTTT events which use the 'Webhooks' service 
 To test the IFTTT events, I first ensure that the ESP32 is connected to the internet by checking the status of the WiFi, then send a GET request with the custom URL. I then verify the success of the request by printing the HTTP code - a returned value of 200 demonstrates that the IFTTT server received the request and triggered the action. I also print out the payload which is a stock message sent by the IFTTT server, confirming the action.
 
 Event | Serial output for IFTTT event triggering  | IFTTT confirmation
------------------------------------ | ----------------------------------
+------|----------------------------- | ----------------------------------
 1 | ![](https://i.imgur.com/6uf9jrX.png) | ![](https://i.imgur.com/bUi9IDQ.png) 
 2 | ![](https://i.imgur.com/lfwr4c4.png) | ![](https://i.imgur.com/XccfvI8.png) 
 3 | ![](https://i.imgur.com/jYJfPy1.png) | ![](https://i.imgur.com/rhsrnY1.png) 
