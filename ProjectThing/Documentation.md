@@ -23,20 +23,20 @@ All of which can be controlled from a webserver!
     - Take and save a photo with the chip camera
     - Activate the 'Home Alone Protocol'
 
-A green LED indicates the system is not active - being in the room will not trigger the alarm. A red LED indiates the system is active - there is a 10 second window from when the system is activated to give the user time to leave the room before the alarm goes off. 
+A green LED indicates the system is not active - being in the room will not trigger the alarm. A red LED indiates the system is active - there is a 10 second window from when the system is activated to give the user time to leave the room before the alarm goes off. The system can also be deactivated from the webserver so that the lights return to normal and movement will no longer trigger the alarm.
+
+Photos taken on the ESP32-CAM board are sent as email attachments to the user's email address using the ESP32 Mail Client library and an SMTP server. This action can be triggered either manually via the controls on the webserver, or automatically when an intruder is detected.
+
+The 'Home Alone Protocol', as shown in the demo, triggers an IFTTT webhook which runs a routine involving changing the light colours and playing music - just like a party. However, the system is also live, meaning movements after the initial buffer period will trigger the alarm routine.
 
 
 ### Demo
 
-<figure class="video_container">
-  <iframe src="https://drive.google.com/file/d/1oypjRXK1XpKEpK6XduvklJfTvHOe3iBW/preview" frameborder="0" allowfullscreen="true"> </iframe>
-</figure>
+System demo:
 
-https://drive.google.com/file/d/1ozbMkNnQQQ6YjLn9UOkw2xQf9SBb08y-/view?usp=sharing
 
-<figure class="video_container">
-  <iframe src="https://drive.google.com/file/d/1ozbMkNnQQQ6YjLn9UOkw2xQf9SBb08y-/preview" frameborder="0" allowfullscreen="true"> </iframe>
-</figure>
+
+Provisioning demo:
 
 https://drive.google.com/file/d/1oypjRXK1XpKEpK6XduvklJfTvHOe3iBW/view?usp=sharing
 
@@ -45,7 +45,8 @@ https://drive.google.com/file/d/1oypjRXK1XpKEpK6XduvklJfTvHOe3iBW/view?usp=shari
 ###### Design
 
 The circuit design of the device:
-- ESP32-CAM board and FTDI adapter
+- ESP32-CAM board
+- FTDI adapter
 - PIR sensor
 - 3 LED's with resistors
 
@@ -73,30 +74,10 @@ The array  | The function | The page
 ### Testing
 
 ###### Testing PIR sensor readings
-For the touch control I utilised the T6 pin on the ESP32 
-- touching the bare wire gave me readings within the range 10-15
-- touching the plastic gave me readings within the range 67-69
-- leaving the wire untouched gave me readings of 76-78
 
-Occasionally, as seen in the serial plot, the ESP would pick up anomalous, noisy readings from the wire - to correct this, I decided to take 2 readings, 200ms apart. I compared the two values and if they within +- 3 from one another, the reading was valid. If not, one of the readings was anomalous and another set of readings would be taken. The method is simple but effective, as below I have plotted 2 graphs of readings; with noise (noisy values set at 100 for clarity) and without noise.
+The PIR sensor operates on GPIO pin 13, setting the pin to `HIGH` when motion is detected and `LOW` otherwise. I tested the sensor by printing the readings every half a second to the Serial output using `Serial.println(digitalRead(PIR));`
 
-Noisy readings  | No noisy readings
-------------- | -------------
-![](https://i.imgur.com/R3lULKQ.png) | ![](https://i.imgur.com/1bIYSEP.png)
-
-*Serial output for different controls*
-
->01:45:54.840 -> Light change
->01:45:55.823 -> Light change
->01:45:58.032 -> Light change
->01:45:59.423 -> Light flash
->01:45:59.831 -> WiFi Disconnected
->01:46:01.219 -> Light flash
->01:46:01.628 -> WiFi Disconnected
->01:46:02.823 -> Light flash
->01:46:03.228 -> WiFi Disconnected
-
-The output shows 'WiFi Disconnected' because the action of touching the plastic part of the cable is meant to trigger an IFTTT event if the device is connected to the internet - when it isnt connected, the loop carries on as normal and the lights continue to flash whilst the wire is held.
+![](https://i.imgur.com/HJM1TZa.jpg)
 
 
 ###### Testing Provisioning
@@ -134,12 +115,30 @@ There is a limitation to this - If the spotify app on my device (phone or laptop
 *Spotify 400 error*
 
 
-###### Testing photo capture and saving
+###### Testing photo capture and sending
 
+I have used and adapted files from the ESP32 CameraWebServer example sketch for this project. The example code provided all of the complex camera pin definitions, as well as the camera configuration and intialisation. The inbuilt method `fb = esp_camera_fb_get();` allows me to capture a photo and store it in the frame buffer. Then, using the SPIFFS library, I create a new image file in memory and write out the contents of the frame buffer.
+
+To send the image file over email, an SMTP server is used. I create an smtpData object, to which I set a SMTP Server host, SMTP port, account email address and password. I then construct the email, and use the ESP32 MailClient library to send the email with the attached image from the board memory.
+
+*Serial output for Image Saving*  | Email confirmation
+----------------------------------- | ----------------------------------
+![](https://i.imgur.com/uvJjbIl.png) | ![](https://i.imgur.com/Bk7UDib.png)
 
 
 
 ### References
+
+I have used and adapted files from the ESP32 CameraWebServer example sketch.
+
+SPIFFS (Serial Peripheral Interface Flash File System):
+https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/storage/spiffs.html
+
+ESP32 Mail Client Library:
+https://github.com/mobizt/ESP-Mail-Client
+
+Sending email with attachments:
+https://github.com/mobizt/ESP-Mail-Client/blob/master/examples/Send_Attachment_File/Send_Attachment_File.ino
 
 WiFi library:
 https://www.arduino.cc/en/Reference/WiFiStatus

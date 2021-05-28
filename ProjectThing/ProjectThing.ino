@@ -594,17 +594,16 @@ void loop() {
     
     if (iterations > 10000 && digitalRead(PIR) == 1){ // time between trigger ~10 seconds
       iterations = 0;
-      dps("INTRUDER DETECTED");
-//      doGET(request);
-//      takePhoto();
-//      sendPhoto();
+      dp("INTRUDER DETECTED");
+      doGET(request);
+      takePhoto();
+      sendPhoto();
     }
   }
     
   // iterations counter - regulated by 1 ms delay
   iterations ++;
-  delay(3000);
-  Serial.println(digitalRead(PIR));
+  delay(1);
   
   // deal with any pending web requests
   webServer.handleClient();
