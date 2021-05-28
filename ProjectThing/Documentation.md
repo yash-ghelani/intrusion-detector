@@ -34,7 +34,9 @@ The 'Home Alone Protocol', as shown in the demo, triggers an IFTTT webhook which
 
 System demo:
 
+[![System Demo](https://res.cloudinary.com/marcomontalbano/image/upload/v1622172209/video_to_markdown/images/google-drive--105kWHTH2NAy-C77CWtCL1wmI0W2H55-u-c05b58ac6eb4c4700831b2b3070cd403.jpg)](https://drive.google.com/file/d/105kWHTH2NAy-C77CWtCL1wmI0W2H55-u/view?usp=sharing "System Demo")
 
+https://drive.google.com/file/d/105kWHTH2NAy-C77CWtCL1wmI0W2H55-u/view?usp=sharing
 
 Provisioning demo:
 
@@ -50,9 +52,18 @@ The circuit design of the device:
 - PIR sensor
 - 3 LED's with resistors
 
-![](https://i.imgur.com/9zX1iqD.jpg)
+Device  | Circuit diagram
+------------- | -------------
+![](https://i.imgur.com/VWXf30f.png) | ![](https://i.imgur.com/oo7ZAX3.jpg)
 
 > My IoT Device.
+
+The site pages:
+
+WiFi Form  | System Control Page | Device Status Page
+------------- | ------------- | ------------
+![](https://i.imgur.com/if3jPMo.png) | ![](https://i.imgur.com/Tp3Bt7S.png) | ![](https://i.imgur.com/lnXk7jn.png)
+
 
 ###### Website design & construction
 
@@ -60,10 +71,10 @@ When flashed, the device will start up a webserver on port 80 with the SSID: 'ss
 - The header - same for all pages except the tite tag contents (which gets passed as an input)
 - The CSS (style tag) - same for all pages
 - The body - there are different functions with different content for each of the different pages
-    - The provisioning form
-    - The LED control buttons
+    - The WiFi provisioning form
+    - The System control buttons
     - The device network status
-- The footer - The same for all pages, contains links to the LED page and Form page
+- The footer - The same for all pages, contains links to the System Control page and WiFi Form page
 
 The different sections are stored in arrays - functions within the code use these arrays to build a string which then contains the full markup for that page. Extra markup is concatenated to the strings in some of the functions, depending on the state of the device.
 
@@ -78,6 +89,10 @@ The array  | The function | The page
 The PIR sensor operates on GPIO pin 13, setting the pin to `HIGH` when motion is detected and `LOW` otherwise. I tested the sensor by printing the readings every half a second to the Serial output using `Serial.println(digitalRead(PIR));`
 
 ![](https://i.imgur.com/HJM1TZa.jpg)
+
+1. Section 1 of the readings is me opening the door and leaving the room. (The small peak is me closing the door shut)
+2. Section 2 represents the readings in an empty room - no movement, no peaks. (ensures no random noisy readings)
+3. Section 3 I enter the room again and move around, getting closer to the sensor every second. Clear indication of movement.
 
 
 ###### Testing Provisioning
@@ -102,17 +117,18 @@ Correct password  | Incorrect password
 
 ###### Testing IFTTT events
 
-The IFTTT event I set up uses the 'Webhooks' service which receives a web request, then triggers a Spotify playback event. I first ensure that the ESP32 is connected to the internet by checking the status of the WiFi, then send a GET request with the custom URL. I then verify the success of the request by printing the HTTP code - a returned value of 200 demonstrates that the IFTTT server received the request and triggered the action. I also print out the payload which is a stock message sent by the IFTTT server, confirming the action.
+For this project, I have set up 3 IFTTT events which use the 'Webhooks' service to trigger different light and sound routines. The 3 events are:
+- An alarm event - triggered when an intruder is detected, lights turn red and alarms played through speakers
+- A House Party event - sets lights to random colours and plays music (inspired by the home alone scene)
+- A reset evet - triggered when deactivating the system, sets the lights back to normal and cuts the music
 
-*Serial output for IFTTT event triggering*  | IFTTT confirmation
+To test the IFTTT events, I first ensure that the ESP32 is connected to the internet by checking the status of the WiFi, then send a GET request with the custom URL. I then verify the success of the request by printing the HTTP code - a returned value of 200 demonstrates that the IFTTT server received the request and triggered the action. I also print out the payload which is a stock message sent by the IFTTT server, confirming the action.
+
+Event | Serial output for IFTTT event triggering  | IFTTT confirmation
 ----------------------------------- | ----------------------------------
-![](https://i.imgur.com/uvJjbIl.png) | ![](https://i.imgur.com/Bk7UDib.png)
-
-
-There is a limitation to this - If the spotify app on my device (phone or laptop) is not running/idle, the triggered action will fail due to a 400 error as show below
-
-![](https://i.imgur.com/sdFJrXb.png)
-*Spotify 400 error*
+1 | ![](https://i.imgur.com/uvJjbIl.png) | ![](https://i.imgur.com/Bk7UDib.png)
+2 | ![](https://i.imgur.com/uvJjbIl.png) | ![](https://i.imgur.com/Bk7UDib.png)
+3 | ![](https://i.imgur.com/uvJjbIl.png) | ![](https://i.imgur.com/Bk7UDib.png)
 
 
 ###### Testing photo capture and sending
@@ -121,10 +137,22 @@ I have used and adapted files from the ESP32 CameraWebServer example sketch for 
 
 To send the image file over email, an SMTP server is used. I create an smtpData object, to which I set a SMTP Server host, SMTP port, account email address and password. I then construct the email, and use the ESP32 MailClient library to send the email with the attached image from the board memory.
 
-*Serial output for Image Saving*  | Email confirmation
+Serial output for Image Saving  | Email confirmation
 ----------------------------------- | ----------------------------------
 ![](https://i.imgur.com/uvJjbIl.png) | ![](https://i.imgur.com/Bk7UDib.png)
 
+
+### Self Assessment
+
+Buy and large, the system works well - the PIR sensor is capable of capturing movement within a room, the IFTTT events are triggered reliably and the photo capture and sending works as intended.
+
+However, as with any project, there is room for improvement. Although the PIR sensor works well enough to detect most movement, through testing I have found that it is possible to be within the same room and move slow enough as to not set off the sensor. This is because the PIR sensor used in this project is fairly basic, and measuring subtle heat changes from minor movements is difficult. This issue can be overcome by using a more sensitive movement sensor, which makes the entire system more reliable.
+
+Another issue is the quality of the photos captured by the ESP32-CAM board. The average size of the photos captured and sent over email is 5KB, therefore, the images are of very low quality. The red lighting helps illuminate objects in the room however it is still fairly pixelated and difficult to make out faces. A solution to this would be to improve the lighting and make use of the inbuilt flash on the board - I attempted to get this working, however, decided to focus my efforts on the core parts of the system functionality due to time constraints.
+
+The device is still currently a prototype, assembled on a breadboard - an obvious improvement would be to move the components over to a circuit board, making the device a bit more physically robust and permanent.
+
+To conclude, there are definitely improvements that can be made which will increase the usefulness and performance of the device, nonetheless, I believe that all of the features implemented work reliably and the device serves as an effective prototype. The site controls, although fairly rudimentry, are intuitive, easy to use and aesthetically minimal - the site structure allows more features to be added to the control page, with options for new pages as well.
 
 
 ### References
@@ -148,3 +176,6 @@ https://github.com/amcewen/HttpClient
 
 GET requests:
 https://techtutorialsx.com/2017/05/19/esp32-http-get-requests/
+
+Alexa Routines from Webhooks:
+https://mkzense.com/
