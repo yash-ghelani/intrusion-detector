@@ -62,7 +62,7 @@ The site pages:
 
 WiFi Form  | System Control Page | Device Status Page
 ------------- | ------------- | ------------
-![](https://i.imgur.com/if3jPMo.png) | ![](https://i.imgur.com/Tp3Bt7S.png) | ![](https://i.imgur.com/lnXk7jn.png)
+![](https://i.imgur.com/lNzoy3b.png) | ![](https://i.imgur.com/ZyYbycp.png) | ![](https://i.imgur.com/bHPYVxt.png)
 
 
 ###### Website design & construction
@@ -88,7 +88,7 @@ The array  | The function | The page
 
 The PIR sensor operates on GPIO pin 13, setting the pin to `HIGH` when motion is detected and `LOW` otherwise. I tested the sensor by printing the readings every half a second to the Serial output using `Serial.println(digitalRead(PIR));`
 
-![](https://i.imgur.com/HJM1TZa.jpg)
+![](https://i.imgur.com/lRODWCB.jpg)
 
 1. Section 1 of the readings is me opening the door and leaving the room. (The small peak is me closing the door shut)
 2. Section 2 represents the readings in an empty room - no movement, no peaks. (ensures no random noisy readings)
@@ -126,9 +126,9 @@ To test the IFTTT events, I first ensure that the ESP32 is connected to the inte
 
 Event | Serial output for IFTTT event triggering  | IFTTT confirmation
 ----------------------------------- | ----------------------------------
-1 | ![](https://i.imgur.com/uvJjbIl.png) | ![](https://i.imgur.com/Bk7UDib.png)
-2 | ![](https://i.imgur.com/uvJjbIl.png) | ![](https://i.imgur.com/Bk7UDib.png)
-3 | ![](https://i.imgur.com/uvJjbIl.png) | ![](https://i.imgur.com/Bk7UDib.png)
+1 | ![](https://i.imgur.com/6uf9jrX.png) | ![](https://i.imgur.com/bUi9IDQ.png) 
+2 | ![](https://i.imgur.com/lfwr4c4.png) | ![](https://i.imgur.com/XccfvI8.png) 
+3 | ![](https://i.imgur.com/jYJfPy1.png) | ![](https://i.imgur.com/rhsrnY1.png) 
 
 
 ###### Testing photo capture and sending
@@ -139,7 +139,7 @@ To send the image file over email, an SMTP server is used. I create an smtpData 
 
 Serial output for Image Saving  | Email confirmation
 ----------------------------------- | ----------------------------------
-![](https://i.imgur.com/uvJjbIl.png) | ![](https://i.imgur.com/Bk7UDib.png)
+![](https://i.imgur.com/qqGLzDE.png) | ![](https://i.imgur.com/Vjejqap.png) 
 
 
 ### Self Assessment
