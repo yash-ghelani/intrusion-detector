@@ -14,12 +14,12 @@
 #define FILE_PHOTO "/photo.jpg"
 
 // Gmail SMTP server settings
-#define emailSenderAccount    "newtempmail08@gmail.com"
-#define emailSenderPassword   "Temporary08!"
+#define emailSenderAccount    "INSERT_TEMP_MAIL_ADDRESS@gmail.com"
+#define emailSenderPassword   "INSERT_TEMP_PASSWORD"
 #define smtpServer            "smtp.gmail.com"
 #define smtpServerPort        465
 #define emailSubject          "Intruder Detected"
-#define emailRecipient        "yashghelani08@gmail.com"
+#define emailRecipient        "USER_EMAIL_ADDRESS@gmail.com"
 
 // Camera
 #define CAMERA_MODEL_AI_THINKER // Has PSRAM
