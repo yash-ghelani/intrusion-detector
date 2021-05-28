@@ -5,11 +5,12 @@
 
 The idea for this project was based around this scene from one of my favourite movies - Home Alone. 
 
-[![Home Alone House Party](https://img.youtube.com/vi/_NrfND5KGtk/0.jpg)](https://www.youtube.com/watch?v=_NrfND5KGtk "Home Alone House Party")
+[![Home Alone](https://res.cloudinary.com/marcomontalbano/image/upload/v1622180650/video_to_markdown/images/youtube--_NrfND5KGtk-c05b58ac6eb4c4700831b2b3070cd403.jpg)](https://www.youtube.com/watch?v=_NrfND5KGtk "Home Alone")
+
 
 There are three main features:
 - A standard intrusion detection mode: when activated, the alarm is sounded
-- Live photo capture and storage: the chip camera takes a photo of the room and stores to an SD card
+- Live photo capture: the chip camera takes a photo of the room and sends it to the user via email
 - House Party mode: Lights are turned on, music is playing, the party is started! (with the intrusion detection running in the background)
 
 All of which can be controlled from a webserver!
@@ -23,7 +24,7 @@ All of which can be controlled from a webserver!
     - Take and save a photo with the chip camera
     - Activate the 'Home Alone Protocol'
 
-A green LED indicates the system is not active - being in the room will not trigger the alarm. A red LED indiates the system is active - there is a 10 second window from when the system is activated to give the user time to leave the room before the alarm goes off. The system can also be deactivated from the webserver so that the lights return to normal and movement will no longer trigger the alarm.
+A green LED indicates the system is not active - being in the room will not trigger the alarm. A red LED indiates the system is active - there is a 10 second window from when the system is activated to give the user time to leave the room before the alarm goes off. The system can also be deactivated from the webserver so that the lights return to normal and movement no longer triggers the alarm.
 
 Photos taken on the ESP32-CAM board are sent as email attachments to the user's email address using the ESP32 Mail Client library and an SMTP server. This action can be triggered either manually via the controls on the webserver, or automatically when an intruder is detected.
 
