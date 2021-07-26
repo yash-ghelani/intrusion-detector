@@ -143,19 +143,6 @@ Serial output for Image Saving  | Email confirmation
 ![](https://i.imgur.com/qqGLzDE.png) | ![](https://i.imgur.com/Vjejqap.png) 
 
 
-### Self Assessment
-
-Buy and large, the system works well - the PIR sensor is capable of capturing movement within a room, the IFTTT events are triggered reliably and the photo capture and sending works as intended.
-
-However, as with any project, there is room for improvement. Although the PIR sensor works well enough to detect most movement, through testing I have found that it is possible to be within the same room and move slow enough as to not set off the sensor. This is because the PIR sensor used in this project is fairly basic, and measuring subtle heat changes from minor movements is difficult. This issue can be overcome by using a more sensitive movement sensor, which makes the entire system more reliable.
-
-Another issue is the quality of the photos captured by the ESP32-CAM board. The average size of the photos captured and sent over email is 5KB, therefore, the images are of very low quality. The red lighting helps illuminate objects in the room however it is still fairly pixelated and difficult to make out faces. A solution to this would be to improve the lighting and make use of the inbuilt flash on the board - I attempted to get this working, however, decided to focus my efforts on the core parts of the system functionality due to time constraints.
-
-The device is still currently a prototype, assembled on a breadboard - an obvious improvement would be to move the components over to a circuit board, making the device a bit more physically robust and permanent.
-
-To conclude, there are definitely improvements that can be made which will increase the usefulness and performance of the device, nonetheless, I believe that all of the features implemented work reliably and the device serves as an effective prototype. The site controls, although fairly rudimentry, are intuitive, easy to use and aesthetically minimal - the site structure allows more features to be added to the control page, with options for new pages as well.
-
-
 ### References
 
 I have used and adapted files from the ESP32 CameraWebServer example sketch.
