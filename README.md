@@ -1,4 +1,4 @@
-# The 'Home Alone' Intrusion Detection System!
+# The 'Home Alone' Intrusion Detection System
 
 
 The idea for this project was based around this scene from one of my favourite movies - Home Alone. 
